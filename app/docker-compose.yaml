@@ -8,4 +8,6 @@ services:
     stdin_open: true
     tty: true
     volumes:
-      - .:/app
+      - myapp:/app
+volumes:
+   myapp:
