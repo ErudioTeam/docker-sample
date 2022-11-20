@@ -1,0 +1,60 @@
+version: "3.9"  # compose format version, optional since v1.27.0
+services:
+  go:          # web is a micro service
+    build:
+      context: .
+      dockerfile: Dockerfile.dbg
+
+    command: /bin/sh -c "go run main.go"
+    stdin_open: true
+    tty: true
+    ports:
+      - 8080:8080
+
+    security_opt:   # Security is unconifined while running in debugging mode. 
+      - "seccomp:unconfined"
+
+    env_file:
+      - app.env
+
+    volumes:
+      - .:/app
+      - ./logs:/app/logs
+
+    links:
+      - redis
+    
+    depends_on:
+      - "db"
+
+  redis:     # redis is a mcrio service and used for cahceing
+    image: redis:alpine
+
+  db:     # common, you should know, it is open source relational database. 
+    image: mysql:8.0
+    platform: linux/amd64
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD}"
+      MYSQL_DATABASE: "${MYSQL_DATABASE}"
+      MYSQL_USER: "${MYSQL_USER}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD}"
+      TZ: 'Asia/Tokyo'
+    command: mysqld --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+
+    volumes:
+     # - ./init:/docker-entrypoint-initdb.d
+     # - app-db:/var/lib/mysql
+      - db-data:/var/lib/mysql
+      - ./db/my.cnf:/etc/mysql/conf.d/my.cnf
+
+    ports:
+      - 3306:3306
+    
+    #networks:
+    #  nt_mysql:
+    #    driver:bridge
+
+volumes:
+  db-data:
+    driver: local

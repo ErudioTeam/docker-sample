@@ -1,0 +1,35 @@
+FROM golang:latest as builder
+WORKDIR /app
+ADD . /app/
+
+RUN go mod tidy
+##RUN go mod vendor
+
+# Running this command does not require the packages to be in GOROOT path enviroment variable. This is need 
+RUN go env -w GO111MODULE=off
+
+RUN go get github.com/go-delve/delve
+RUN go install github.com/go-delve/delve/cmd/dlv@latest
+RUN go mod download github.com/cilium/ebpf
+
+
+#go get github.com/sirupsen/logrus@v1.8.1
+RUN go get github.com/sirupsen/logrus@latest
+# go get github.com/spf13/afero@v1.6.0
+RUN go get github.com/spf13/afero@latest
+# go get github.com/spf13/afero@v1.6.0
+RUN go get github.com/go-playground/validator/v10@latest
+#go get github.com/json-iterator/go@v1.1.11
+RUN go get github.com/json-iterator/go@latest
+
+#RUN go mod init github.com/ErudioTeam/my-package
+
+#RUN go mod vendor 
+
+RUN go get github.com/githubnemo/CompileDaemon@latest
+
+ENTRYPOINT CompileDaemon --build="CGO_ENABLED=0 go build -o erudio" --command=./main
+
+RUN CGO_ENABLED=0 go build -o erudio
+
+CMD ["dlv", "--listen=:2345", "--headless=true", "--log-dest=log.txt", "--api-version=2", "--accept-multiclient", "exec", "./erudio"]

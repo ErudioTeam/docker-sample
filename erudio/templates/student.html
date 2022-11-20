@@ -1,0 +1,23 @@
+<html>
+<body>
+<h1 style="background-color:powderblue;text-align:center;">Students</h1>
+<style>
+    body {
+        font-family: Arial;
+        margin: 0;
+    }
+
+    .content {padding:20px;}
+</style>
+
+
+<div class="content">
+    {{ range $student := .students }}
+    <h1>{{ .Name }}</h1>
+    <p>Sutdent ID : {{ .ID }}</p>
+    <p>Fathers Name:  {{ .FatherName }}</p>
+    <hr/>
+    {{ end }}
+</div>
+</body>
+</html>
