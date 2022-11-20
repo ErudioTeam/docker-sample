@@ -1,0 +1,21 @@
+services:
+ go:
+    container_name: erudio-web-app
+    build:
+      context: .
+      dockerfile: DockerFile
+    command: /bin/sh -c "go run main.go"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+    ports:
+      - 8080:8080
+    networks:
+      - erudio-network-app-db
+    depends_on:
+      - "db"      
+networks:
+  erudio-network-app-db:
+    name: erudio_mysql_network
+    external: true

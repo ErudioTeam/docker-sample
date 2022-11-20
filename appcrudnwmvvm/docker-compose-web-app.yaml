@@ -1,0 +1,22 @@
+version: '3'
+services:
+  go:
+    container_name: web-app
+    build:
+      context: .
+      dockerfile: DockerFile
+    command: /bin/sh -c "go run main.go"
+    stdin_open: true
+    tty: true
+    volumes:
+      - .:/app
+    networks:
+      - network
+    ports:
+      - 8080:8080
+    depends_on:
+      - "db"      
+networks:
+  network:
+    driver: bridge
+    name: mysql_network
